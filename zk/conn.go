@@ -539,18 +539,22 @@ func (c *Conn) loop() {
 			c.resendZkAuth(reauthChan)
 
 			c.sendSetWatches()
-			time.Sleep(1 * time.Second)
+			time.Sleep(1 * time.Millisecond)
 			wg.Wait()
 		}
 
 		c.setState(StateDisconnected)
+		c.logger.Printf("Set disconnected")
+		time.Sleep(1 * time.Millisecond)
 
 		select {
 		case <-c.shouldQuit:
 			c.flushRequests(ErrClosing)
+			c.logger.Printf("Get quit notice")
 			return
 		default:
 		}
+		c.logger.Printf("After select should quit")
 
 		if err != ErrSessionExpired {
 			err = ErrConnectionClosed
