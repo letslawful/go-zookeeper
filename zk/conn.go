@@ -539,13 +539,13 @@ func (c *Conn) loop() {
 			c.resendZkAuth(reauthChan)
 
 			c.sendSetWatches()
-			time.Sleep(1 * time.Millisecond)
+			time.Sleep(5 * time.Millisecond)
 			wg.Wait()
 		}
 
 		c.setState(StateDisconnected)
 		c.logger.Printf("Set disconnected")
-		time.Sleep(1 * time.Millisecond)
+		time.Sleep(5 * time.Millisecond)
 
 		select {
 		case <-c.shouldQuit:
