@@ -310,12 +310,15 @@ func WithMaxConnBufferSize(maxBufferSize int) connOption {
 }
 
 func (c *Conn) Close() {
+	c.logger.Printf("Close begin")
 	close(c.shouldQuit)
 
 	select {
 	case <-c.queueRequest(opClose, &closeRequest{}, &closeResponse{}, nil):
 	case <-time.After(time.Second):
 	}
+
+	c.logger.Printf("Close done")
 }
 
 // State returns the current state of the connection.
@@ -366,6 +369,7 @@ func (c *Conn) connect() error {
 		c.serverMu.Unlock()
 		c.setState(StateConnecting)
 		if retryStart {
+			c.logger.Printf("connect when retryrestart")
 			c.flushUnsentRequests(ErrNoServer)
 			select {
 			case <-time.After(time.Second):
@@ -535,6 +539,7 @@ func (c *Conn) loop() {
 			c.resendZkAuth(reauthChan)
 
 			c.sendSetWatches()
+			time.Sleep(1 * time.Second)
 			wg.Wait()
 		}
 
